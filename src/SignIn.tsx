@@ -1,3 +1,6 @@
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   InputGroup,
   InputGroupAddon,
@@ -11,20 +14,20 @@ import { LockIcon } from "@/icons/LockIcon";
 import { UserIcon } from "@/icons/UserIcon";
 import { SignInIcon } from "./icons/SignInIcon";
 
+const signInSchema = z.object({
+  username: z.string().min(1, "Логин обязателен"),
+  password: z.string().min(1, "Пароль обязателен"),
+});
+
+type SignInSchema = z.infer<typeof signInSchema>;
+
 export function SignIn() {
-  const handleLogin = () => {
-    fetch("https://dummyjson.com/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: "emilys",
-        password: "emilyspass",
-        expiresInMins: 30, // optional, defaults to 60
-      }),
-      // credentials: "include", // Include cookies (e.g., accessToken) in the request
-    })
-      .then((res) => res.json())
-      .then(console.log);
+  const form = useForm<SignInSchema>({
+    resolver: zodResolver(signInSchema),
+  });
+
+  const onSubmit = (data: SignInSchema) => {
+    console.log(data);
   };
 
   return (
@@ -32,7 +35,10 @@ export function SignIn() {
       <div className="p-1.5 rounded-[40px] bg-white shadow-[0_24px_32px_rgba(0,0,0,0.04)] w-131.25">
         <div className="rounded-[34px] p-px bg-linear-[180deg,rgb(237,237,237,1)20%,rgb(237,237,237,0)100%]">
           <div className="bg-white rounded-[34px]">
-            <div className="flex p-12 flex-col items-center gap-8 rounded-[34px] bg-linear-[180deg,rgba(35,35,35,0.03)0%,rgba(35,35,35,0.00)50%]">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex p-12 flex-col items-center gap-8 rounded-[34px] bg-linear-[180deg,rgba(35,35,35,0.03)0%,rgba(35,35,35,0.00)50%]"
+            >
               <SignInIcon />
               <div className="flex flex-col justify-center items-center gap-3">
                 <p className="text-[40px] font-semibold leading-[1.1em] tracking-[-0.015em]">
@@ -44,41 +50,66 @@ export function SignIn() {
               </div>
               <div className="flex flex-col justify-center items-start gap-5 w-[399px]">
                 <div className="flex flex-col items-start gap-4 w-full">
-                  <div className="flex flex-col items-start gap-1.5 w-full">
-                    <p className="text-[#232323] text-lg font-medium tracking-[-0.015em]">
-                      Логин
-                    </p>
-                    <InputGroup>
-                      <InputGroupInput
-                        defaultValue="test"
-                        className="text-black"
-                      />
-                      <InputGroupAddon>
-                        <UserIcon />
-                      </InputGroupAddon>
-                      <InputGroupAddon align="inline-end">
-                        <CrossIcon />
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5 w-full">
-                    <p className="text-[#232323] text-lg font-medium tracking-[-0.015em]">
-                      Пароль
-                    </p>
-                    <InputGroup>
-                      <InputGroupInput
-                        defaultValue="test"
-                        type="password"
-                        className="text-black"
-                      />
-                      <InputGroupAddon>
-                        <LockIcon />
-                      </InputGroupAddon>
-                      <InputGroupAddon align="inline-end" className="pr-4">
-                        <EyeOffIcon />
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </div>
+                  <Controller
+                    name="username"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <div className="flex flex-col items-start gap-1.5 w-full">
+                        <p className="text-[#232323] text-lg font-medium tracking-[-0.015em]">
+                          Логин
+                        </p>
+                        <InputGroup>
+                          <InputGroupInput {...field} className="text-black" />
+                          <InputGroupAddon>
+                            <UserIcon />
+                          </InputGroupAddon>
+                          {field.value && (
+                            <InputGroupAddon align="inline-end">
+                              <Button
+                                variant="link"
+                                className="p-0"
+                                onClick={() => {
+                                  field.onChange("");
+                                }}
+                              >
+                                <CrossIcon />
+                              </Button>
+                            </InputGroupAddon>
+                          )}
+                        </InputGroup>
+                        {fieldState.invalid && (
+                          <p className="text-destructive">Логин обязателен</p>
+                        )}
+                      </div>
+                    )}
+                  />
+                  <Controller
+                    name="password"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <div className="flex flex-col items-start gap-1.5 w-full">
+                        <p className="text-[#232323] text-lg font-medium tracking-[-0.015em]">
+                          Пароль
+                        </p>
+                        <InputGroup>
+                          <InputGroupInput
+                            {...field}
+                            type="password"
+                            className="text-black"
+                          />
+                          <InputGroupAddon>
+                            <LockIcon />
+                          </InputGroupAddon>
+                          <InputGroupAddon align="inline-end" className="pr-4">
+                            <EyeOffIcon />
+                          </InputGroupAddon>
+                        </InputGroup>
+                        {fieldState.invalid && (
+                          <p className="text-destructive">Пароль обязателен</p>
+                        )}
+                      </div>
+                    )}
+                  />
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Checkbox className="border-2 border-muted shadow-none size-5 m-0.5" />
@@ -89,7 +120,6 @@ export function SignIn() {
                     <Button
                       type="submit"
                       className="cursor-pointer w-full rounded-xl text-lg py-4 px-2 h-[54px] border border-[#367AFF] bg-linear-[180deg,rgba(255,255,255,0.12)-100%,rgba(255,255,255,0.12)100%),#242EDB]"
-                      onClick={handleLogin}
                     >
                       Войти
                     </Button>
@@ -125,7 +155,7 @@ export function SignIn() {
                   Создать
                 </a>
               </p>
-            </div>
+            </form>
           </div>
         </div>
       </div>
