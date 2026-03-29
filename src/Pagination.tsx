@@ -1,18 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { CaretLeftIcon } from "@/icons/CaretLeftIcon";
 import { CaretRightIcon } from "@/icons/CaretRightIcon";
+import { usePaginationStore } from "@/stores/use-pagination-store";
 import { memo, useMemo } from "react";
 
 const ELLIPSIS = "ellipsis";
 
-type PaginationProps = {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-};
-
-export const Pagination = memo((props: PaginationProps) => {
-  const { currentPage = 1, totalPages, onPageChange } = props;
+export const Pagination = memo(() => {
+  const currentPage = usePaginationStore((state) => state.currentPage);
+  const totalPages = usePaginationStore((state) => state.totalPages);
+  const setCurrentPage = usePaginationStore((state) => state.setCurrentPage);
 
   const items = useMemo(() => {
     if (totalPages <= 7) {
@@ -51,13 +48,13 @@ export const Pagination = memo((props: PaginationProps) => {
 
   const handlePrevious = () => {
     if (!isFirstPage) {
-      onPageChange(currentPage - 1);
+      setCurrentPage(currentPage - 1);
     }
   };
 
   const handleNext = () => {
     if (!isLastPage) {
-      onPageChange(currentPage + 1);
+      setCurrentPage(currentPage + 1);
     }
   };
 
@@ -87,7 +84,7 @@ export const Pagination = memo((props: PaginationProps) => {
           return currentPage === item ? (
             <Button
               key={item}
-              onClick={() => onPageChange(item)}
+              onClick={() => setCurrentPage(item)}
               className="min-w-7.5 h-7.5 border-none rounded bg-[#797FEA]"
             >
               {item}
@@ -96,7 +93,7 @@ export const Pagination = memo((props: PaginationProps) => {
             <Button
               key={item}
               variant={"secondary"}
-              onClick={() => onPageChange(item)}
+              onClick={() => setCurrentPage(item)}
               className="text-[#B2B3B9] shadow-none border-[#ECECEB] bg-white min-w-7.5 h-7.5 rounded"
             >
               {item}

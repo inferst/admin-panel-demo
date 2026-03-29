@@ -11,9 +11,7 @@ export const useProductsQuery = (params: SearchProductsParams) => {
       params.limit,
       params.skip,
     ],
-    queryFn: async () => {
-      return searchProducts(params);
-    },
+    queryFn: async () => searchProducts(params),
     placeholderData: keepPreviousData,
   });
 };

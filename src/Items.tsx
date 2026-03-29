@@ -14,14 +14,17 @@ import { useDebounce } from "@/lib/debounce";
 import { Pagination } from "@/Pagination";
 import { useCategoriesQuery } from "@/queries/use-categories-query";
 import { useProductsQuery } from "@/queries/use-products-query";
+import { usePaginationStore } from "@/stores/use-pagination-store";
 import type { SortingState } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const LIMIT = 20;
 
 export function Items() {
-  const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const currentPage = usePaginationStore((state) => state.currentPage);
+  const setCurrentPage = usePaginationStore((state) => state.setCurrentPage);
+  const setTotalPages = usePaginationStore((state) => state.setTotalPages);
 
   const [sorting, setSorting] = useLocalStorage<SortingState>("sorting", []);
 
@@ -59,6 +62,10 @@ export function Items() {
   const totalPages = useMemo(() => {
     return Math.ceil(total / limit);
   }, [total, limit]);
+
+  useEffect(() => {
+    setTotalPages(totalPages);
+  }, [setTotalPages, totalPages]);
 
   const handleSearch = (event: React.InputEvent) => {
     const target = event.target as HTMLInputElement;
@@ -135,11 +142,7 @@ export function Items() {
                 </span>{" "}
                 из <span className="text-[#333]">{total}</span>
               </p>
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
+              <Pagination />
             </div>
           )}
         </div>
