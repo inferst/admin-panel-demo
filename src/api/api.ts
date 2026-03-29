@@ -8,6 +8,13 @@ type PostLoginParams = {
   remember: boolean;
 };
 
+export type AddProductParams = {
+  title: string;
+  price: number;
+  brand: string;
+  sku: string;
+};
+
 export async function login(params: PostLoginParams) {
   const result = await fetch("https://dummyjson.com/auth/login", {
     method: "POST",
@@ -82,4 +89,9 @@ export async function getCategories(): Promise<GetCategoriesResponse> {
 
 export async function getMe() {
   return apiFetch("/auth/me");
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function addProduct(_params: AddProductParams) {
+  return new Promise((resolve) => setTimeout(resolve, 500));
 }

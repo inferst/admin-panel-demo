@@ -4,6 +4,7 @@ import {
 } from "@/components/catalog/AddProductDialog";
 import { CatalogHeader } from "@/components/catalog/CatalogHeader";
 import { CatalogMain } from "@/components/catalog/Catalog";
+import { useAddProductMutation } from "@/mutations/use-add-product-mutation";
 import { useCatalogSearchStore } from "@/stores/use-catalog-search-store";
 import { toast } from "sonner";
 
@@ -14,8 +15,10 @@ export const CatalogPage = () => {
   const setIsAddDialogOpen = useCatalogSearchStore(
     (state) => state.setIsAddDialogOpen,
   );
+  const addProductMutation = useAddProductMutation();
 
-  const handleAddProduct = (values: AddProductFormValues) => {
+  const handleAddProduct = async (values: AddProductFormValues) => {
+    await addProductMutation.mutateAsync(values);
     setIsAddDialogOpen(false);
     toast.success(`Товар "${values.title}" добавлен`);
   };
@@ -27,6 +30,7 @@ export const CatalogPage = () => {
       <AddProductDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
+        isSubmitting={addProductMutation.isPending}
         onSubmit={handleAddProduct}
       />
     </div>

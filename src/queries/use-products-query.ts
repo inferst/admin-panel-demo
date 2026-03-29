@@ -1,4 +1,8 @@
-import { searchProducts, type SearchProductsParams } from "@/api/api";
+import {
+  getProducts,
+  searchProducts,
+  type SearchProductsParams,
+} from "@/api/api";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useProductsQuery = (params: SearchProductsParams) => {
@@ -11,7 +15,7 @@ export const useProductsQuery = (params: SearchProductsParams) => {
       params.limit,
       params.skip,
     ],
-    queryFn: async () => searchProducts(params),
+    queryFn: async () => (params.q ? searchProducts(params) : getProducts(params)),
     placeholderData: keepPreviousData,
   });
 };

@@ -33,11 +33,12 @@ type AddProductFormInput = z.input<typeof AddProductSchema>;
 type AddProductDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: AddProductFormValues) => void;
+  onSubmit: (values: AddProductFormValues) => Promise<void> | void;
+  isSubmitting?: boolean;
 };
 
 export function AddProductDialog(props: AddProductDialogProps) {
-  const { open, onOpenChange, onSubmit } = props;
+  const { open, onOpenChange, onSubmit, isSubmitting = false } = props;
 
   const form = useForm<AddProductFormInput, undefined, AddProductFormValues>({
     resolver: zodResolver(AddProductSchema),
@@ -57,8 +58,8 @@ export function AddProductDialog(props: AddProductDialogProps) {
     onOpenChange(value);
   };
 
-  const handleSubmit = form.handleSubmit((values) => {
-    onSubmit({
+  const handleSubmit = form.handleSubmit(async (values) => {
+    await onSubmit({
       title: values.title.trim(),
       price: values.price,
       brand: values.brand.trim(),
@@ -92,6 +93,7 @@ export function AddProductDialog(props: AddProductDialogProps) {
                 id="title"
                 placeholder="Например, Apple Watch SE"
                 className="h-12 rounded-lg border-[#ECECEB] bg-[#F8F8F8] px-4 shadow-none"
+                disabled={isSubmitting}
                 aria-invalid={!!form.formState.errors.title}
                 {...form.register("title")}
               />
@@ -114,6 +116,7 @@ export function AddProductDialog(props: AddProductDialogProps) {
                   inputMode="decimal"
                   placeholder="19999"
                   className="h-12 rounded-lg border-[#ECECEB] bg-[#F8F8F8] px-4 shadow-none"
+                  disabled={isSubmitting}
                   aria-invalid={!!form.formState.errors.price}
                   {...form.register("price")}
                 />
@@ -131,6 +134,7 @@ export function AddProductDialog(props: AddProductDialogProps) {
                   id="brand"
                   placeholder="Apple"
                   className="h-12 rounded-lg border-[#ECECEB] bg-[#F8F8F8] px-4 shadow-none"
+                  disabled={isSubmitting}
                   aria-invalid={!!form.formState.errors.brand}
                   {...form.register("brand")}
                 />
@@ -149,6 +153,7 @@ export function AddProductDialog(props: AddProductDialogProps) {
                 id="sku"
                 placeholder="AW-SE-44-BLK"
                 className="h-12 rounded-lg border-[#ECECEB] bg-[#F8F8F8] px-4 shadow-none"
+                disabled={isSubmitting}
                 aria-invalid={!!form.formState.errors.sku}
                 {...form.register("sku")}
               />
@@ -160,6 +165,7 @@ export function AddProductDialog(props: AddProductDialogProps) {
             <Button
               type="button"
               variant="outline"
+              disabled={isSubmitting}
               onClick={() => handleOpenChange(false)}
               className="h-11 rounded-lg border-[#ECECEB] bg-white px-5 font-cairo font-semibold shadow-none"
             >
@@ -168,9 +174,10 @@ export function AddProductDialog(props: AddProductDialogProps) {
             <Button
               type="submit"
               size="lg"
+              disabled={isSubmitting}
               className="h-11 rounded-lg border-none px-5 font-cairo font-semibold"
             >
-              Сохранить
+              {isSubmitting ? "Сохранение..." : "Сохранить"}
             </Button>
           </DialogFooter>
         </form>
