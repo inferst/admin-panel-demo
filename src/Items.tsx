@@ -1,3 +1,7 @@
+import {
+  AddProductDialog,
+  type AddProductFormValues,
+} from "@/components/add-product-dialog";
 import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
 import { Button } from "@/components/ui/button";
@@ -17,11 +21,13 @@ import { useProductsQuery } from "@/queries/use-products-query";
 import { usePaginationStore } from "@/stores/use-pagination-store";
 import type { SortingState } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const LIMIT = 20;
 
 export function Items() {
   const [search, setSearch] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const currentPage = usePaginationStore((state) => state.currentPage);
   const setCurrentPage = usePaginationStore((state) => state.setCurrentPage);
   const setTotalPages = usePaginationStore((state) => state.setTotalPages);
@@ -40,6 +46,7 @@ export function Items() {
     sortBy: sorting[0]?.id,
     order: sorting[0]?.desc ? "desc" : "asc",
   });
+
   const productsData = productsQuery.data;
   const isFetching = productsQuery.isFetching;
 
@@ -52,6 +59,7 @@ export function Items() {
         const category = categoriesData
           ? (categoriesData.get(product.category) ?? product.category)
           : product.category;
+
         return { ...product, category };
       }) ?? []
     );
@@ -60,7 +68,7 @@ export function Items() {
   const total = productsData?.total ?? 0;
 
   const totalPages = useMemo(() => {
-    return Math.ceil(total / limit);
+    return Math.max(1, Math.ceil(total / limit));
   }, [total, limit]);
 
   useEffect(() => {
@@ -77,6 +85,11 @@ export function Items() {
     setSearch("");
     setCurrentPage(1);
     setSorting([]);
+  };
+
+  const handleAddProduct = (values: AddProductFormValues) => {
+    setIsAddDialogOpen(false);
+    toast.success(`Товар "${values.title}" добавлен`);
   };
 
   return (
@@ -114,6 +127,7 @@ export function Items() {
                 <ArrowsClockwise />
               </Button>
               <Button
+                onClick={() => setIsAddDialogOpen(true)}
                 size={"lg"}
                 className="border-none font-semibold font-cairo"
               >
@@ -147,6 +161,11 @@ export function Items() {
           )}
         </div>
       </div>
+      <AddProductDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSubmit={handleAddProduct}
+      />
     </div>
   );
 }

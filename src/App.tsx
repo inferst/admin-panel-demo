@@ -1,10 +1,11 @@
+import { Toaster } from "@/components/ui/sonner";
 import { Items } from "@/Items";
 import { PrivateRoute } from "@/PrivateRoute";
 import { SignIn } from "@/SignIn";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import "./App.css";
-import { Suspense } from "react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +28,7 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
+        <Toaster richColors position="top-right" style={{'fontSize': '4em'}} />
       </Suspense>
     </QueryClientProvider>
   );
