@@ -13,21 +13,45 @@ import { EyeOffIcon } from "@/icons/EyeOffIcon";
 import { LockIcon } from "@/icons/LockIcon";
 import { UserIcon } from "@/icons/UserIcon";
 import { SignInIcon } from "./icons/SignInIcon";
+import { useLoginMutation } from "@/mutations/loginMutation";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const signInSchema = z.object({
   username: z.string().min(1, "Логин обязателен"),
   password: z.string().min(1, "Пароль обязателен"),
+  remember: z.boolean(),
 });
 
 type SignInSchema = z.infer<typeof signInSchema>;
 
 export function SignIn() {
+  const loginMutation = useLoginMutation();
+  const navigate = useNavigate();
+
+  const [loginError, setLoginError] = useState("");
+  const [passwordVisibility, setPasswordVisibility] = useState(false);
+
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      remember: false,
+    },
   });
 
-  const onSubmit = (data: SignInSchema) => {
-    console.log(data);
+  const onSubmit = async (data: SignInSchema) => {
+    try {
+      await loginMutation.mutateAsync(data);
+      navigate("/");
+    } catch (err) {
+      setLoginError("Неправильные логин или пароль");
+
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
   };
 
   return (
@@ -64,8 +88,12 @@ export function SignIn() {
                             <UserIcon />
                           </InputGroupAddon>
                           {field.value && (
-                            <InputGroupAddon align="inline-end">
+                            <InputGroupAddon
+                              align="inline-end"
+                              className="pr-4"
+                            >
                               <Button
+                                type="button"
                                 variant="link"
                                 className="p-0"
                                 onClick={() => {
@@ -94,14 +122,23 @@ export function SignIn() {
                         <InputGroup>
                           <InputGroupInput
                             {...field}
-                            type="password"
+                            type={passwordVisibility ? "text" : "password"}
                             className="text-black"
                           />
                           <InputGroupAddon>
                             <LockIcon />
                           </InputGroupAddon>
                           <InputGroupAddon align="inline-end" className="pr-4">
-                            <EyeOffIcon />
+                            <Button
+                              type="button"
+                              variant="link"
+                              className="p-0"
+                              onClick={() => {
+                                setPasswordVisibility((value) => !value);
+                              }}
+                            >
+                              <EyeOffIcon />
+                            </Button>
                           </InputGroupAddon>
                         </InputGroup>
                         {fieldState.invalid && (
@@ -111,10 +148,25 @@ export function SignIn() {
                     )}
                   />
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <Checkbox className="border-2 border-muted shadow-none size-5 m-0.5" />
-                  <p className="text-[#9C9C9C] font-medium">Запомнить данные</p>
-                </div>
+                <label className="flex gap-2.5">
+                  <Controller
+                    name="remember"
+                    control={form.control}
+                    render={({ field }) => (
+                      <>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="border-2 border-muted shadow-none size-5 m-0.5"
+                        />
+                        <span className="text-[#9C9C9C] font-medium">
+                          Запомнить данные
+                        </span>
+                      </>
+                    )}
+                  />
+                </label>
+                <p className="text-destructive">{loginError}</p>
                 <div className="flex flex-col items-start gap-4 w-full">
                   <div className="w-full">
                     <Button

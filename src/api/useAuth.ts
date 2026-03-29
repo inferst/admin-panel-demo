@@ -12,7 +12,7 @@ export function useAuth() {
   } = useQuery({
     queryKey: ["auth", "me"],
     queryFn: getMe,
-    enabled: tokenManager.isLoggedIn(),
+    enabled: !!tokenManager.getAccess(),
     staleTime: Infinity,
     retry: false,
   });

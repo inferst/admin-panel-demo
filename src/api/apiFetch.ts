@@ -33,7 +33,7 @@ async function runRefresh() {
 
     const data = await result.json();
 
-    tokenManager.setTokens(data);
+    tokenManager.setTokens(data.accessToken, data.refreshToken);
     refreshQueue.forEach(({ resolve }) => resolve());
   } catch (e) {
     tokenManager.clear();

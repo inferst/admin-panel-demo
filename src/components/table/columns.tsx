@@ -2,7 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DotsIcon } from "@/icons/DotsIcon";
 import { PlusIcon } from "@/icons/PlusIcon";
-import { type ColumnDef } from "@tanstack/react-table";
+import { type Column, type ColumnDef } from "@tanstack/react-table";
+import {
+  ArrowDownWideNarrowIcon,
+  ArrowUpDownIcon,
+  ArrowUpNarrowWideIcon,
+} from "lucide-react";
 
 export type Product = {
   id: string;
@@ -13,6 +18,28 @@ export type Product = {
   brand: string;
   sku: string;
   rating: number;
+};
+
+const sortingHeaderButton = (
+  title: string,
+  column: Column<Product, unknown>,
+) => {
+  return (
+    <button
+      type="button"
+      className="inline-flex items-center"
+      onClick={column.getToggleSortingHandler()}
+    >
+      {title}
+      <span className="ml-2">
+        {column.getIsSorted() === "asc" && <ArrowUpNarrowWideIcon size={16} />}
+        {column.getIsSorted() === "desc" && (
+          <ArrowDownWideNarrowIcon size={16} />
+        )}
+        {column.getIsSorted() === false && <ArrowUpDownIcon size={16} />}
+      </span>
+    </button>
+  );
 };
 
 export const columns: ColumnDef<Product>[] = [
@@ -42,8 +69,11 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "title",
-    header: () => <div className="text-left">Наименование</div>,
-    enableSorting: true,
+    header: ({ column }) => (
+      <div className="text-left">
+        {sortingHeaderButton("Наименование", column)}
+      </div>
+    ),
     cell: ({ row, getValue }) => {
       return (
         <div className="flex">
@@ -52,7 +82,7 @@ export const columns: ColumnDef<Product>[] = [
             className="w-[48px] h-[48px] rounded-lg border border-[#ECECEB] mr-[18px]"
           />
           <div className="flex flex-col justify-between overflow-hidden">
-            <strong className="truncate">{getValue<string>()}</strong>
+            <strong className="truncate text-left">{getValue<string>()}</strong>
             <span className="text-sm text-left text-[#B2B3B9] truncate">
               {row.original.category}
             </span>
@@ -63,24 +93,24 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "brand",
-    header: "Вендор",
+    header: ({ column }) => sortingHeaderButton("Вендор", column),
     cell: ({ cell }) => {
       return <strong>{cell.getValue<string>()}</strong>;
     },
   },
   {
     accessorKey: "sku",
-    header: "Артикул",
+    header: ({ column }) => sortingHeaderButton("Артикул", column),
   },
   {
     accessorKey: "rating",
-    header: "Оценка",
+    header: ({ column }) => sortingHeaderButton("Оценка", column),
     cell: ({ cell }) => {
       const rating = cell.getValue<number>();
       return (
         <>
           <span className={rating < 3.5 ? "text-destructive" : ""}>
-            {rating.toFixed(1)}
+            {rating}
           </span>
           /5
         </>
@@ -89,7 +119,7 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "price",
-    header: "Цена, ₽",
+    header: ({ column }) => sortingHeaderButton("Цена, ₽", column),
     cell: ({ cell }) => {
       const formatted = new Intl.NumberFormat("ru-RU", {
         minimumFractionDigits: 2,

@@ -4,7 +4,9 @@ import {
   flexRender,
   getCoreRowModel,
   type Header,
+  type OnChangeFn,
   type Row,
+  type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -18,21 +20,29 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { type CSSProperties, useCallback } from "react";
+import type { Product } from "@/components/table/columns";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
+type DataTableProps<TValue> = {
+  columns: ColumnDef<Product, TValue>[];
+  data: Product[];
+  sorting: SortingState;
+  onSortingChange: OnChangeFn<SortingState>;
+};
 
-export function DataTable<TData, TValue>({
+export function DataTable<TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+  sorting,
+  onSortingChange,
+}: DataTableProps<TValue>) {
   // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({
+  const table = useReactTable<Product>({
     data,
     columns,
+    state: { sorting },
+    onSortingChange,
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
   });
 
   const renderHeader = useCallback(<T,>(header: Header<T, unknown>) => {
@@ -99,7 +109,12 @@ export function DataTable<TData, TValue>({
       <Table>
         <colgroup>
           <col style={{ width: "56px" } as CSSProperties} />
+          <col style={{ width: "30%" } as CSSProperties} />
           <col style={{ width: "20%" } as CSSProperties} />
+          <col style={{ width: "20%" } as CSSProperties} />
+          <col style={{ width: "10%" } as CSSProperties} />
+          <col style={{ width: "10%" } as CSSProperties} />
+          <col style={{ width: "10%" } as CSSProperties} />
         </colgroup>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

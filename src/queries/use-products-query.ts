@@ -1,13 +1,19 @@
-import { getMe } from "@/api/authApi";
-import { tokenManager } from "@/api/tokenManager";
-import { useQuery } from "@tanstack/react-query";
+import { searchProducts, type SearchProductsParams } from "@/api/authApi";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
-export function useProductsQuery() {
+export const useProductsQuery = (params: SearchProductsParams) => {
   return useQuery({
-    queryKey: ["products"],
-    queryFn: getMe,
-    enabled: tokenManager.isLoggedIn(),
-    staleTime: Infinity,
-    retry: false,
+    queryKey: [
+      "products",
+      params.q,
+      params.sortBy,
+      params.order,
+      params.limit,
+      params.skip,
+    ],
+    queryFn: async () => {
+      return searchProducts(params);
+    },
+    placeholderData: keepPreviousData,
   });
-}
+};

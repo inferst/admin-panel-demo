@@ -1,17 +1,80 @@
-import { TableWidget } from "@/components/table/TableWidget";
+import { columns } from "@/components/table/columns";
+import { DataTable } from "@/components/table/DataTable";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
-  InputGroupInput,
   InputGroupAddon,
+  InputGroupInput,
 } from "@/components/ui/input-group";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import { ArrowsClockwise } from "@/icons/ArrowsClockwise";
-import { CaretLeftIcon } from "@/icons/CaretLeftIcon";
-import { CaretRightIcon } from "@/icons/CaretRightIcon";
 import { PlusCircleIcon } from "@/icons/PlusCircleIcon";
 import { SearchIcon } from "@/icons/SearchIcon";
+import { useDebounce } from "@/lib/debounce";
+import { Pagination } from "@/Pagination";
+import { useCategoriesQuery } from "@/queries/use-categories-query";
+import { useProductsQuery } from "@/queries/use-products-query";
+import type { SortingState } from "@tanstack/react-table";
+import { useMemo, useState } from "react";
+
+const LIMIT = 20;
 
 export function Items() {
+  const [selected, setSelected] = useState(1);
+  const [search, setSearch] = useState("");
+
+  const [sorting, setSorting] = useLocalStorage<SortingState>("sorting", []);
+
+  const debouncedSearch = useDebounce(search, 300);
+
+  const skip = (selected - 1) * LIMIT;
+  const limit = LIMIT;
+
+  const productsQuery = useProductsQuery({
+    q: debouncedSearch,
+    limit,
+    skip,
+    sortBy: sorting[0]?.id,
+    order: sorting[0]?.desc ? "desc" : "asc",
+  });
+  const productsData = productsQuery.data;
+  const isFetching = productsQuery.isFetching;
+
+  const categoriesQuery = useCategoriesQuery();
+  const categoriesData = categoriesQuery.data;
+
+  const products = useMemo(() => {
+    return (
+      productsData?.products.map((product) => {
+        const category = categoriesData
+          ? (categoriesData.get(product.category) ?? product.category)
+          : product.category;
+        return { ...product, category };
+      }) ?? []
+    );
+  }, [productsData, categoriesData]);
+
+  const total = productsData?.total ?? 0;
+
+  const pagination = useMemo(() => {
+    const count = Math.ceil(total / limit);
+    const pages = [...Array(count).keys()].map((page) => page + 1);
+
+    return { pages, selected, setSelected };
+  }, [total, limit, selected]);
+
+  const handleSearch = (event: React.InputEvent) => {
+    const target = event.target as HTMLInputElement;
+    setSearch(target.value);
+    setSelected(1);
+  };
+
+  const handleRefresh = () => {
+    setSearch("");
+    setSelected(1);
+    setSorting([]);
+  };
+
   return (
     <div className="flex py-5 flex-col gap-[30px] h-full">
       <div className="relative flex px-[30px] items-center rounded-[10px] bg-[#FFF] h-[105px]">
@@ -20,6 +83,8 @@ export function Items() {
         </div>
         <InputGroup className="absolute w-[54%] top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 bg-[#F3F3F3] border-none shadow-none h-auto">
           <InputGroupInput
+            value={search}
+            onInput={handleSearch}
             placeholder="Найти"
             className="text-[#999] h-auto p-0!"
           />
@@ -38,6 +103,7 @@ export function Items() {
             </p>
             <div className="flex items-start gap-2 w-fit">
               <Button
+                onClick={handleRefresh}
                 variant="outline"
                 className="size-11 shadow-none border-[#ECECEB] bg-white rounded-lg p-0 [&_svg:not([class*='size-'])]:size-5.5"
               >
@@ -52,32 +118,33 @@ export function Items() {
               </Button>
             </div>
           </div>
-          <TableWidget />
-          <div className="flex py-[11px] justify-between">
-            <p className="text-[#969B9F] font-roboto text-lg">
-              Показано <span className="text-[#333]">1-20</span> из{" "}
-              <span className="text-[#333]">120</span>
-            </p>
-            <div className="flex gap-4">
-              <Button variant="link" className="w-7.5 h-7.5 border-none">
-                <CaretLeftIcon />
-              </Button>
-              <div className="flex gap-2">
-                <Button className="min-w-7.5 h-7.5 border-none rounded bg-[#797FEA]">
-                  1
-                </Button>
-                <Button
-                  variant={"secondary"}
-                  className="text-[#B2B3B9] shadow-none border-[#ECECEB] bg-white min-w-7.5 h-7.5 rounded"
-                >
-                  2
-                </Button>
-              </div>
-              <Button variant="link" className="w-7.5 h-7.5 border-none">
-                <CaretRightIcon />
-              </Button>
-            </div>
+          <div className="relative">
+            <DataTable
+              columns={columns}
+              data={products}
+              sorting={sorting}
+              onSortingChange={setSorting}
+            />
+            {isFetching && (
+              <div className="top-0 left-0 absolute w-full h-full bg-muted/40 rounded-md" />
+            )}
           </div>
+          {products.length > 0 && (
+            <div className="flex py-[11px] justify-between">
+              <p className="text-[#969B9F] font-roboto text-lg">
+                Показано{" "}
+                <span className="text-[#333]">
+                  {skip + 1}-{Math.min(total, skip + limit)}
+                </span>{" "}
+                из <span className="text-[#333]">{total}</span>
+              </p>
+              <Pagination
+                pages={pagination.pages}
+                selected={pagination.selected}
+                onChange={pagination.setSelected}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,33 +1,53 @@
-const KEYS = {
-  ACCESS: "auth_access_token",
-  REFRESH: "auth_refresh_token",
-};
+const ACCESS_KEY = "auth_access";
+const REFRESH_KEY = "auth_refresh";
+const PERSIST_KEY = "auth_persist";
 
-type Tokens = {
-  accessToken: string;
-  refreshToken: string;
-};
-
-export const tokenManager = {
+class TokenStore {
   getAccess() {
-    return localStorage.getItem(KEYS.ACCESS);
-  },
+    return (
+      localStorage.getItem(ACCESS_KEY) ??
+      sessionStorage.getItem(ACCESS_KEY) ??
+      null
+    );
+  }
 
   getRefresh() {
-    return localStorage.getItem(KEYS.REFRESH);
-  },
+    return (
+      localStorage.getItem(REFRESH_KEY) ??
+      sessionStorage.getItem(REFRESH_KEY) ??
+      null
+    );
+  }
 
-  setTokens({ accessToken, refreshToken }: Tokens) {
-    localStorage.setItem(KEYS.ACCESS, accessToken);
-    localStorage.setItem(KEYS.REFRESH, refreshToken);
-  },
+  setTokens(accessToken: string, refreshToken: string) {
+    localStorage.removeItem(REFRESH_KEY);
+    sessionStorage.removeItem(REFRESH_KEY);
+
+    const storage = this.getStorage();
+
+    storage.setItem(ACCESS_KEY, accessToken);
+    storage.setItem(REFRESH_KEY, refreshToken);
+  }
 
   clear() {
-    localStorage.removeItem(KEYS.ACCESS);
-    localStorage.removeItem(KEYS.REFRESH);
-  },
+    localStorage.removeItem(PERSIST_KEY);
 
-  isLoggedIn() {
-    return !!this.getAccess();
-  },
-};
+    localStorage.removeItem(ACCESS_KEY);
+    sessionStorage.removeItem(ACCESS_KEY);
+
+    localStorage.removeItem(REFRESH_KEY);
+    sessionStorage.removeItem(REFRESH_KEY);
+  }
+
+  setPersist(persist: boolean) {
+    localStorage.setItem(PERSIST_KEY, persist ? "1" : "0");
+  }
+
+  getStorage() {
+    return localStorage.getItem(PERSIST_KEY) === "1"
+      ? localStorage
+      : sessionStorage;
+  }
+}
+
+export const tokenManager = new TokenStore();

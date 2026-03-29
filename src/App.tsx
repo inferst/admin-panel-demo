@@ -4,6 +4,7 @@ import { SignIn } from "@/SignIn";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router";
 import "./App.css";
+import { Suspense } from "react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,14 +18,16 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<SignIn />} />
-          <Route element={<PrivateRoute />}>
-            <Route path="/" element={<Items />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <Suspense>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<SignIn />} />
+            <Route element={<PrivateRoute />}>
+              <Route path="/" element={<Items />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </Suspense>
     </QueryClientProvider>
   );
 }
