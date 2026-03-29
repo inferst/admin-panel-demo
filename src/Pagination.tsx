@@ -1,53 +1,112 @@
 import { Button } from "@/components/ui/button";
 import { CaretLeftIcon } from "@/icons/CaretLeftIcon";
 import { CaretRightIcon } from "@/icons/CaretRightIcon";
-import { cn } from "@/lib/utils";
-import { memo } from "react";
+import { memo, useMemo } from "react";
+
+const ELLIPSIS = "ellipsis";
 
 type PaginationProps = {
-  pages: number[];
-  selected: number;
-  onChange: (page: number) => void;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 };
 
 export const Pagination = memo((props: PaginationProps) => {
-  const { pages, selected = 1, onChange } = props;
+  const { currentPage = 1, totalPages, onPageChange } = props;
+
+  const items = useMemo(() => {
+    if (totalPages <= 7) {
+      return [...Array(totalPages).keys()].map((page) => page + 1);
+    }
+
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, `${ELLIPSIS}-right`, totalPages];
+    }
+
+    if (currentPage >= totalPages - 3) {
+      return [
+        1,
+        `${ELLIPSIS}-left`,
+        totalPages - 4,
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+    }
+
+    return [
+      1,
+      `${ELLIPSIS}-left`,
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      `${ELLIPSIS}-right`,
+      totalPages,
+    ];
+  }, [currentPage, totalPages]);
+
+  const isFirstPage = currentPage <= 1;
+  const isLastPage = totalPages <= 0 || currentPage >= totalPages;
+
+  const handlePrevious = () => {
+    if (!isFirstPage) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (!isLastPage) {
+      onPageChange(currentPage + 1);
+    }
+  };
 
   return (
     <div className="flex gap-4">
       <Button
-        disabled={selected <= 1}
-        onClick={() => onChange(selected - 1)}
+        disabled={isFirstPage}
+        onClick={handlePrevious}
         variant="link"
         className="w-7.5 h-7.5 border-none"
       >
         <CaretLeftIcon />
       </Button>
       <div className="flex gap-2">
-        {pages.map((page) => {
-          return selected == page ? (
+        {items.map((item) => {
+          if (typeof item === "string") {
+            return (
+              <div
+                key={item}
+                className="flex min-w-7.5 h-7.5 items-center justify-center text-[#B2B3B9]"
+              >
+                ...
+              </div>
+            );
+          }
+
+          return currentPage === item ? (
             <Button
-              key={page}
-              onClick={() => onChange(page)}
-              className={cn("min-w-7.5 h-7.5 border-none rounded bg-[#797FEA]")}
+              key={item}
+              onClick={() => onPageChange(item)}
+              className="min-w-7.5 h-7.5 border-none rounded bg-[#797FEA]"
             >
-              {page}
+              {item}
             </Button>
           ) : (
             <Button
-              key={page}
+              key={item}
               variant={"secondary"}
-              onClick={() => onChange(page)}
+              onClick={() => onPageChange(item)}
               className="text-[#B2B3B9] shadow-none border-[#ECECEB] bg-white min-w-7.5 h-7.5 rounded"
             >
-              {page}
+              {item}
             </Button>
           );
         })}
       </div>
       <Button
-        disabled={selected >= pages.length}
-        onClick={() => onChange(selected + 1)}
+        disabled={isLastPage}
+        onClick={handleNext}
         variant="link"
         className="w-7.5 h-7.5 border-none"
       >

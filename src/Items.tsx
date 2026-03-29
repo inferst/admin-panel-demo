@@ -20,14 +20,14 @@ import { useMemo, useState } from "react";
 const LIMIT = 20;
 
 export function Items() {
-  const [selected, setSelected] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
 
   const [sorting, setSorting] = useLocalStorage<SortingState>("sorting", []);
 
   const debouncedSearch = useDebounce(search, 300);
 
-  const skip = (selected - 1) * LIMIT;
+  const skip = (currentPage - 1) * LIMIT;
   const limit = LIMIT;
 
   const productsQuery = useProductsQuery({
@@ -56,22 +56,19 @@ export function Items() {
 
   const total = productsData?.total ?? 0;
 
-  const pagination = useMemo(() => {
-    const count = Math.ceil(total / limit);
-    const pages = [...Array(count).keys()].map((page) => page + 1);
-
-    return { pages, selected, setSelected };
-  }, [total, limit, selected]);
+  const totalPages = useMemo(() => {
+    return Math.ceil(total / limit);
+  }, [total, limit]);
 
   const handleSearch = (event: React.InputEvent) => {
     const target = event.target as HTMLInputElement;
     setSearch(target.value);
-    setSelected(1);
+    setCurrentPage(1);
   };
 
   const handleRefresh = () => {
     setSearch("");
-    setSelected(1);
+    setCurrentPage(1);
     setSorting([]);
   };
 
@@ -139,9 +136,9 @@ export function Items() {
                 из <span className="text-[#333]">{total}</span>
               </p>
               <Pagination
-                pages={pagination.pages}
-                selected={pagination.selected}
-                onChange={pagination.setSelected}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
               />
             </div>
           )}
