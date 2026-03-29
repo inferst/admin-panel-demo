@@ -2,35 +2,36 @@ import { Pagination } from "@/components/catalog/Pagination";
 import { columns } from "@/components/catalog/table/columns";
 import { CatalogTable } from "@/components/catalog/table/CatalogTable";
 import { Button } from "@/components/ui/button";
-import { useDebounceValue } from "@/hooks/use-debounce-value";
 import { ArrowsClockwise } from "@/icons/ArrowsClockwise";
 import { PlusCircleIcon } from "@/icons/PlusCircleIcon";
 import { useCategoriesQuery } from "@/queries/use-categories-query";
 import { useProductsQuery } from "@/queries/use-products-query";
 import { useCatalogSearchStore } from "@/stores/use-catalog-search-store";
+import { useCatalogSortingStore } from "@/stores/use-catalog-sorting-store";
 import { usePaginationStore } from "@/stores/use-pagination-store";
+import type { SortingState, Updater } from "@tanstack/react-table";
 import { useEffect, useMemo } from "react";
 
 const LIMIT = 20;
 
 export const CatalogMain = () => {
   const search = useCatalogSearchStore((state) => state.search);
-  const sorting = useCatalogSearchStore((state) => state.sorting);
-  const setSorting = useCatalogSearchStore((state) => state.setSorting);
   const resetSearch = useCatalogSearchStore((state) => state.resetSearch);
+  const sorting = useCatalogSortingStore((state) => state.sorting);
+  const setSorting = useCatalogSortingStore((state) => state.setSorting);
+  const resetSorting = useCatalogSortingStore((state) => state.resetSorting);
   const currentPage = usePaginationStore((state) => state.currentPage);
   const setTotalPages = usePaginationStore((state) => state.setTotalPages);
+  const setCurrentPage = usePaginationStore((state) => state.setCurrentPage);
   const setIsAddDialogOpen = useCatalogSearchStore(
     (state) => state.setIsAddDialogOpen,
   );
-
-  const debouncedSearch = useDebounceValue(search, 300);
 
   const skip = (currentPage - 1) * LIMIT;
   const limit = LIMIT;
 
   const productsQuery = useProductsQuery({
-    q: debouncedSearch,
+    q: search,
     limit,
     skip,
     sortBy: sorting[0]?.id,
@@ -67,6 +68,13 @@ export const CatalogMain = () => {
 
   const handleRefresh = () => {
     resetSearch();
+    resetSorting();
+    setCurrentPage(1);
+  };
+
+  const handleSortingChange = (updaterOrValue: Updater<SortingState>) => {
+    setCurrentPage(1);
+    setSorting(updaterOrValue);
   };
 
   return (
@@ -98,7 +106,7 @@ export const CatalogMain = () => {
           columns={columns}
           data={products}
           sorting={sorting}
-          onSortingChange={setSorting}
+          onSortingChange={handleSortingChange}
         />
         {isFetching && (
           <div className="top-0 left-0 absolute w-full h-full bg-muted/40 rounded-md" />

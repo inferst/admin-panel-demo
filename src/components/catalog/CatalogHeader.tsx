@@ -3,16 +3,26 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useDebounceValue } from "@/hooks/use-debounce-value";
 import { SearchIcon } from "@/icons/SearchIcon";
 import { useCatalogSearchStore } from "@/stores/use-catalog-search-store";
+import { usePaginationStore } from "@/stores/use-pagination-store";
+import { useEffect, useState } from "react";
 
 export const CatalogHeader = () => {
-  const search = useCatalogSearchStore((state) => state.search);
   const setSearch = useCatalogSearchStore((state) => state.setSearch);
+  const setCurrentPage = usePaginationStore((state) => state.setCurrentPage);
 
-  const handleSearch = (event: React.InputEvent) => {
-    const target = event.target as HTMLInputElement;
-    setSearch(target.value);
+  const [inputValue, setInputValue] = useState("");
+  const debouncedSearch = useDebounceValue(inputValue, 300);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setSearch(debouncedSearch);
+  }, [debouncedSearch, setCurrentPage, setSearch]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
   };
 
   return (
@@ -21,10 +31,10 @@ export const CatalogHeader = () => {
       <InputGroup className="absolute w-[54%] top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 bg-[#F3F3F3] border-none shadow-none h-auto">
         <InputGroupInput
           id="search"
-          value={search}
-          onInput={handleSearch}
+          value={inputValue}
+          onChange={handleSearch}
           placeholder="Найти"
-          className="text-[#999] h-12 p-0! text-black"
+          className="h-12 p-0! text-black"
         />
         <InputGroupAddon className="pl-5 py-3 pr-2">
           <div className="w-6 h-6">
