@@ -42,7 +42,12 @@ export function LoginPage() {
   });
 
   const onSubmit = async (data: LoginForm) => {
+    if (loginMutation.isPending) {
+      return;
+    }
+
     try {
+      setLoginError("");
       await loginMutation.mutateAsync(data);
       navigate("/");
     } catch (err) {
@@ -83,7 +88,18 @@ export function LoginPage() {
                           Логин
                         </p>
                         <LoginInputGroup>
-                          <LoginInputGroupInput {...field} className="text-black" />
+                          <LoginInputGroupInput
+                            {...field}
+                            className="text-black"
+                            disabled={loginMutation.isPending}
+                            onChange={(event) => {
+                              if (loginError) {
+                                setLoginError("");
+                              }
+
+                              field.onChange(event);
+                            }}
+                          />
                           <LoginInputGroupAddon>
                             <UserIcon />
                           </LoginInputGroupAddon>
@@ -96,7 +112,12 @@ export function LoginPage() {
                                 type="button"
                                 variant="link"
                                 className="p-0"
+                                disabled={loginMutation.isPending}
                                 onClick={() => {
+                                  if (loginError) {
+                                    setLoginError("");
+                                  }
+
                                   field.onChange("");
                                 }}
                               >
@@ -124,15 +145,27 @@ export function LoginPage() {
                             {...field}
                             type={passwordVisibility ? "text" : "password"}
                             className="text-black"
+                            disabled={loginMutation.isPending}
+                            onChange={(event) => {
+                              if (loginError) {
+                                setLoginError("");
+                              }
+
+                              field.onChange(event);
+                            }}
                           />
                           <LoginInputGroupAddon>
                             <LockIcon />
                           </LoginInputGroupAddon>
-                          <LoginInputGroupAddon align="inline-end" className="pr-4">
+                          <LoginInputGroupAddon
+                            align="inline-end"
+                            className="pr-4"
+                          >
                             <Button
                               type="button"
                               variant="link"
                               className="p-0"
+                              disabled={loginMutation.isPending}
                               onClick={() => {
                                 setPasswordVisibility((value) => !value);
                               }}
@@ -157,6 +190,7 @@ export function LoginPage() {
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
+                          disabled={loginMutation.isPending}
                           className="border-2 border-muted shadow-none size-5 m-0.5"
                         />
                         <span className="text-[#9C9C9C] font-medium">
@@ -171,7 +205,8 @@ export function LoginPage() {
                   <div className="w-full">
                     <Button
                       type="submit"
-                      className="cursor-pointer w-full rounded-xl text-lg py-4 px-2 h-13.5 border border-[#367AFF] bg-linear-[180deg,rgba(255,255,255,0.12)-100%,rgba(255,255,255,0.12)100%),#242EDB]"
+                      disabled={loginMutation.isPending}
+                      className="cursor-pointer w-full rounded-xl text-lg py-4 px-2 h-13.5 border border-[#367AFF] bg-linear-[180deg,rgba(255,255,255,0.12)-100%,rgba(255,255,255,0.12),#242EDB]"
                     >
                       Войти
                     </Button>

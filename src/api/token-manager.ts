@@ -20,6 +20,9 @@ class TokenStore {
   }
 
   setTokens(accessToken: string, refreshToken: string) {
+    localStorage.removeItem(ACCESS_KEY);
+    sessionStorage.removeItem(ACCESS_KEY);
+
     localStorage.removeItem(REFRESH_KEY);
     sessionStorage.removeItem(REFRESH_KEY);
 
