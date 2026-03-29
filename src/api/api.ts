@@ -1,20 +1,20 @@
-import { tokenManager } from "@/api/tokenManager";
-import { apiFetch } from "./apiFetch";
-import type { Product } from "@/components/table/columns";
+import { tokenManager } from "@/api/token-manager";
+import type { Product } from "@/components/catalog/table/columns";
+import { apiFetch } from "./api-fetch";
 
-type LoginProps = {
+type PostLoginParams = {
   username: string;
   password: string;
   remember: boolean;
 };
 
-export async function login(props: LoginProps) {
+export async function login(params: PostLoginParams) {
   const result = await fetch("https://dummyjson.com/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      username: props.username,
-      password: props.password,
+      username: params.username,
+      password: params.password,
       expiresInMins: 30,
     }),
   });
@@ -23,7 +23,7 @@ export async function login(props: LoginProps) {
 
   const data = await result.json();
 
-  tokenManager.setPersist(props.remember);
+  tokenManager.setPersist(params.remember);
   tokenManager.setTokens(data.accessToken, data.refreshToken);
 
   return data;

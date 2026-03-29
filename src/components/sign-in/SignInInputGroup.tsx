@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/sign-in-input"
+import { Input } from "@/components/sign-in/SignInInput"
 import { Textarea } from "@/components/ui/textarea"
 
 function InputGroup({ className, ...props }: React.ComponentProps<"div">) {

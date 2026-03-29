@@ -1,21 +1,21 @@
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@/components/sign-in-input-group";
+} from "@/components/sign-in/SignInInputGroup";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CrossIcon } from "@/icons/CrossIcon";
 import { EyeOffIcon } from "@/icons/EyeOffIcon";
 import { LockIcon } from "@/icons/LockIcon";
 import { UserIcon } from "@/icons/UserIcon";
-import { SignInIcon } from "./icons/SignInIcon";
-import { useLoginMutation } from "@/mutations/loginMutation";
+import { useLoginMutation } from "@/mutations/use-login-mutation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+import { z } from "zod";
+import { SignInIcon } from "../../icons/SignInIcon";
 
 const signInSchema = z.object({
   username: z.string().min(1, "Логин обязателен"),
@@ -25,7 +25,7 @@ const signInSchema = z.object({
 
 type SignInSchema = z.infer<typeof signInSchema>;
 
-export function SignIn() {
+export function SignInPage() {
   const loginMutation = useLoginMutation();
   const navigate = useNavigate();
 

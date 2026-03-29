@@ -1,4 +1,4 @@
-import { tokenManager } from "./tokenManager";
+import { tokenManager } from "./token-manager";
 
 const BASE = "https://dummyjson.com";
 

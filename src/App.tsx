@@ -1,7 +1,7 @@
+import { CatalogPage } from "@/components/pages/CatalogPage";
+import { SignInPage } from "@/components/pages/SignInPage";
 import { Toaster } from "@/components/ui/sonner";
-import { Items } from "@/Items";
-import { PrivateRoute } from "@/PrivateRoute";
-import { SignIn } from "@/SignIn";
+import { PrivateRoute } from "@/components/PrivateRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
@@ -11,7 +11,6 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
-      retry: false,
     },
   },
 });
@@ -22,13 +21,13 @@ function App() {
       <Suspense>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<SignIn />} />
+            <Route path="/login" element={<SignInPage />} />
             <Route element={<PrivateRoute />}>
-              <Route path="/" element={<Items />} />
+              <Route path="/" element={<CatalogPage />} />
             </Route>
           </Routes>
         </BrowserRouter>
-        <Toaster richColors position="top-right" style={{'fontSize': '4em'}} />
+        <Toaster richColors position="top-right" />
       </Suspense>
     </QueryClientProvider>
   );

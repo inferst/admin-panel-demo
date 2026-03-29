@@ -1,4 +1,4 @@
-import { searchProducts, type SearchProductsParams } from "@/api/authApi";
+import { searchProducts, type SearchProductsParams } from "@/api/api";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useProductsQuery = (params: SearchProductsParams) => {

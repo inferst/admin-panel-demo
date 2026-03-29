@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { type CSSProperties, useCallback } from "react";
-import type { Product } from "@/components/table/columns";
+import type { Product } from "@/components/catalog/table/columns";
 
 type DataTableProps<TValue> = {
   columns: ColumnDef<Product, TValue>[];

@@ -1,21 +1,21 @@
 import {
   AddProductDialog,
   type AddProductFormValues,
-} from "@/components/add-product-dialog";
-import { columns } from "@/components/table/columns";
-import { DataTable } from "@/components/table/DataTable";
+} from "@/components/catalog/AddProductDialog";
+import { Pagination } from "@/components/catalog/Pagination";
+import { columns } from "@/components/catalog/table/columns";
+import { DataTable } from "@/components/catalog/table/DataTable";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useDebounceValue } from "@/hooks/use-debounce-value";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { ArrowsClockwise } from "@/icons/ArrowsClockwise";
 import { PlusCircleIcon } from "@/icons/PlusCircleIcon";
 import { SearchIcon } from "@/icons/SearchIcon";
-import { useDebounce } from "@/lib/debounce";
-import { Pagination } from "@/Pagination";
 import { useCategoriesQuery } from "@/queries/use-categories-query";
 import { useProductsQuery } from "@/queries/use-products-query";
 import { usePaginationStore } from "@/stores/use-pagination-store";
@@ -25,7 +25,7 @@ import { toast } from "sonner";
 
 const LIMIT = 20;
 
-export function Items() {
+export const CatalogPage = () => {
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const currentPage = usePaginationStore((state) => state.currentPage);
@@ -34,7 +34,7 @@ export function Items() {
 
   const [sorting, setSorting] = useLocalStorage<SortingState>("sorting", []);
 
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounceValue(search, 300);
 
   const skip = (currentPage - 1) * LIMIT;
   const limit = LIMIT;
@@ -168,4 +168,4 @@ export function Items() {
       />
     </div>
   );
-}
+};
