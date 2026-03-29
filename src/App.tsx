@@ -4,7 +4,7 @@ import { PrivateRoute } from "@/components/PrivateRoute";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { HashRouter, Route, Routes } from "react-router";
 import "./App.css";
 
 const queryClient = new QueryClient({
@@ -19,14 +19,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense>
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route element={<PrivateRoute />}>
               <Route path="/" element={<CatalogPage />} />
             </Route>
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
         <Toaster richColors position="top-right" />
       </Suspense>
     </QueryClientProvider>
