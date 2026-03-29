@@ -79,7 +79,7 @@ export const columns: ColumnDef<Product>[] = [
         <div className="flex">
           <img
             src={row.original.thumbnail}
-            className="w-[48px] h-[48px] rounded-lg border border-[#ECECEB] mr-[18px]"
+            className="w-12 h-12 rounded-lg border border-[#ECECEB] mr-4.5"
           />
           <div className="flex flex-col justify-between overflow-hidden">
             <strong className="truncate text-left">{getValue<string>()}</strong>
@@ -136,7 +136,7 @@ export const columns: ColumnDef<Product>[] = [
         <div className="flex items-center gap-6">
           <Button
             size={"icon"}
-            className="h-auto py-px w-[52px] h-[27px] rounded-full border-none"
+            className="py-px w-13 h-6.75 rounded-full border-none"
           >
             <PlusIcon />
           </Button>

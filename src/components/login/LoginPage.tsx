@@ -1,8 +1,8 @@
 import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/sign-in/SignInInputGroup";
+  LoginInputGroup,
+  LoginInputGroupAddon,
+  LoginInputGroupInput,
+} from "@/components/login/LoginInputGroup";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CrossIcon } from "@/icons/CrossIcon";
@@ -17,23 +17,23 @@ import { useNavigate } from "react-router";
 import { z } from "zod";
 import { SignInIcon } from "../../icons/SignInIcon";
 
-const signInSchema = z.object({
+const LoginSchema = z.object({
   username: z.string().min(1, "Логин обязателен"),
   password: z.string().min(1, "Пароль обязателен"),
   remember: z.boolean(),
 });
 
-type SignInSchema = z.infer<typeof signInSchema>;
+type LoginForm = z.infer<typeof LoginSchema>;
 
-export function SignInPage() {
+export function LoginPage() {
   const loginMutation = useLoginMutation();
   const navigate = useNavigate();
 
   const [loginError, setLoginError] = useState("");
   const [passwordVisibility, setPasswordVisibility] = useState(false);
 
-  const form = useForm<SignInSchema>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<LoginForm>({
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -41,7 +41,7 @@ export function SignInPage() {
     },
   });
 
-  const onSubmit = async (data: SignInSchema) => {
+  const onSubmit = async (data: LoginForm) => {
     try {
       await loginMutation.mutateAsync(data);
       navigate("/");
@@ -72,7 +72,7 @@ export function SignInPage() {
                   Пожалуйста, авторизируйтесь
                 </p>
               </div>
-              <div className="flex flex-col justify-center items-start gap-5 w-[399px]">
+              <div className="flex flex-col justify-center items-start gap-5 w-99.75">
                 <div className="flex flex-col items-start gap-4 w-full">
                   <Controller
                     name="username"
@@ -82,13 +82,13 @@ export function SignInPage() {
                         <p className="text-[#232323] text-lg font-medium tracking-[-0.015em]">
                           Логин
                         </p>
-                        <InputGroup>
-                          <InputGroupInput {...field} className="text-black" />
-                          <InputGroupAddon>
+                        <LoginInputGroup>
+                          <LoginInputGroupInput {...field} className="text-black" />
+                          <LoginInputGroupAddon>
                             <UserIcon />
-                          </InputGroupAddon>
+                          </LoginInputGroupAddon>
                           {field.value && (
-                            <InputGroupAddon
+                            <LoginInputGroupAddon
                               align="inline-end"
                               className="pr-4"
                             >
@@ -102,9 +102,9 @@ export function SignInPage() {
                               >
                                 <CrossIcon />
                               </Button>
-                            </InputGroupAddon>
+                            </LoginInputGroupAddon>
                           )}
-                        </InputGroup>
+                        </LoginInputGroup>
                         {fieldState.invalid && (
                           <p className="text-destructive">Логин обязателен</p>
                         )}
@@ -119,16 +119,16 @@ export function SignInPage() {
                         <p className="text-[#232323] text-lg font-medium tracking-[-0.015em]">
                           Пароль
                         </p>
-                        <InputGroup>
-                          <InputGroupInput
+                        <LoginInputGroup>
+                          <LoginInputGroupInput
                             {...field}
                             type={passwordVisibility ? "text" : "password"}
                             className="text-black"
                           />
-                          <InputGroupAddon>
+                          <LoginInputGroupAddon>
                             <LockIcon />
-                          </InputGroupAddon>
-                          <InputGroupAddon align="inline-end" className="pr-4">
+                          </LoginInputGroupAddon>
+                          <LoginInputGroupAddon align="inline-end" className="pr-4">
                             <Button
                               type="button"
                               variant="link"
@@ -139,8 +139,8 @@ export function SignInPage() {
                             >
                               <EyeOffIcon />
                             </Button>
-                          </InputGroupAddon>
-                        </InputGroup>
+                          </LoginInputGroupAddon>
+                        </LoginInputGroup>
                         {fieldState.invalid && (
                           <p className="text-destructive">Пароль обязателен</p>
                         )}
@@ -171,7 +171,7 @@ export function SignInPage() {
                   <div className="w-full">
                     <Button
                       type="submit"
-                      className="cursor-pointer w-full rounded-xl text-lg py-4 px-2 h-[54px] border border-[#367AFF] bg-linear-[180deg,rgba(255,255,255,0.12)-100%,rgba(255,255,255,0.12)100%),#242EDB]"
+                      className="cursor-pointer w-full rounded-xl text-lg py-4 px-2 h-13.5 border border-[#367AFF] bg-linear-[180deg,rgba(255,255,255,0.12)-100%,rgba(255,255,255,0.12)100%),#242EDB]"
                     >
                       Войти
                     </Button>
@@ -201,7 +201,7 @@ export function SignInPage() {
                   </div>
                 </div>
               </div>
-              <p className="text-[#6C6C6C] font-inter text-lg font-semibold w-full text-center">
+              <p className="text-[#6C6C6C] text-lg font-semibold w-full text-center">
                 Нет аккаунта?{" "}
                 <a href="" className="text-[#242EDB] underline">
                   Создать

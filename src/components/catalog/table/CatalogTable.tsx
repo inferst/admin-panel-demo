@@ -1,3 +1,13 @@
+import type { Product } from "@/components/catalog/table/columns";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import {
   type Cell,
   type ColumnDef,
@@ -9,32 +19,21 @@ import {
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import { type CSSProperties, useCallback } from "react";
-import type { Product } from "@/components/catalog/table/columns";
 
-type DataTableProps<TValue> = {
+type CatalogTableProps<TValue> = {
   columns: ColumnDef<Product, TValue>[];
   data: Product[];
   sorting: SortingState;
   onSortingChange: OnChangeFn<SortingState>;
 };
 
-export function DataTable<TValue>({
+export function CatalogTable<TValue>({
   columns,
   data,
   sorting,
   onSortingChange,
-}: DataTableProps<TValue>) {
+}: CatalogTableProps<TValue>) {
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable<Product>({
     data,

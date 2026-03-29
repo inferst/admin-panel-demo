@@ -1,7 +1,7 @@
-import { CatalogPage } from "@/components/pages/CatalogPage";
-import { SignInPage } from "@/components/pages/SignInPage";
-import { Toaster } from "@/components/ui/sonner";
+import { CatalogPage } from "@/components/catalog/CatalogPage";
+import { LoginPage } from "@/components/login/LoginPage";
 import { PrivateRoute } from "@/components/PrivateRoute";
+import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
@@ -21,7 +21,7 @@ function App() {
       <Suspense>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<SignInPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route element={<PrivateRoute />}>
               <Route path="/" element={<CatalogPage />} />
             </Route>
